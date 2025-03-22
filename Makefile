@@ -1,41 +1,31 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: anavagya <marvin@42.fr>                    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/03/22 12:16:28 by anavagya          #+#    #+#              #
-#    Updated: 2025/03/22 12:53:39 by anavagya         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME = pipex
 
-SRCS = ./sources/*.c
+SRCS = ./sources/main.c
 
 OBJS = $(SRCS:.c=.o)
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
+LIBFT = ./libft/libft.a
+
 all : $(NAME)
 
-$(NAME) : $(LIBFT) $(OBJS)
-	$(CC) $(LIBFT) $(OBJS) -o $(NAME)
+$(NAME) : $(OBJS) $(LIBFT)
+	$(CC) $(CFLAGS) -I ./includes -I ./libft  $(OBJS) -L ./libft -lft -o $(NAME)
 
 $(LIBFT) :
-	make -C ./libft/ all
+	make -C ./libft all
 
-%.o: %.c $(NAME).h
-	@$(CC) $(FLAGS) -c -o $@ $<
+%.o: %.c
+	$(CC) $(CFLAGS) -I./includes -I./libft -c -o $@ $<
 
 clean :
-	make -C ./libft/ clean
+	make -C ./libft clean
 	rm -f $(OBJS)
 
 fclean : clean
-	make -C ./libft/ fclean
+	make -C ./libft fclean
 	rm -f $(NAME)
 
 re : fclean all

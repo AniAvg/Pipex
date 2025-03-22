@@ -47,7 +47,7 @@ char	*ft_gnl_strjoin(char *s1, char *s2)
 	if (!s2)
 		return (NULL);
 	if (!s1)
-		s1 = ft_strdup("");
+		s1 = ft_gnl_strdup("");
 	str = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
 	if (!str)
 		return (NULL);

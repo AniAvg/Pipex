@@ -10,25 +10,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/pipex.h"
+#include <pipex.h>
 
-int	main(int argc, char **argv, char **envp)
+char	*find_path(char **envp)
 {
+	int	i;
+
+	i = 0;
+	while (!(ft_strncmp(envp[i], "PATH", 4)))
+		i++;
+	return (*envp + 5);
+}
+
+
+int	main(int argc, char **argv, char **envp __attribute__((unused)))
+{
+	(void)argv;
 	if (argc != 5)
 		printf("Inch reaktiv eq\n");
-	else
-	{
-		int	i;
-
-		i = 0;
-		while (envp[i])
-		{
-			if (ft_strncmp(envp[i], "PATH=", 5))
-			{
-				
-			}
-			i++;
-		}
-	}
+	printf("%s\n", find_path(envp));
 	return (0);
 }
