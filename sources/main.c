@@ -12,6 +12,13 @@
 
 #include <pipex.h>
 
+void	open_files(int argc, char **argv, t_pipex *pipe)
+{
+	pipe->file1 = open(argv[1], O_RDONLY);
+	pipe->file2 = open(argv[5], ); 
+	// sharunakeli
+}
+
 char	*find_path(char **envp)
 {
 	int	i;
@@ -22,12 +29,47 @@ char	*find_path(char **envp)
 	return (envp[i] + 5);
 }
 
+char	*get_command(char **path, char	*cmd)
+{	
+	int		i;
+	char	*smth;//anun@ kpoxem kam el che
+	char	*command;
 
-int	main(int argc, char **argv, char **envp __attribute__((unused)))
+	i = 0;
+	while (path[i])
+	{
+		smth = ft_strjoin(path[i], "/");
+		command = ft_strjoin(smth, cmd);
+		if (access(command, F_OK) == 1)
+			return (command);
+		i++;
+	}
+	return (NULL);
+}
+
+int main(int argc, char **argv, char **envp)
 {
+	int		i;
+	t_pipex	pipe;
+
+	i = 0;
 	(void)argv;
 	if (argc != 5)
-		printf("Inch reaktiv eq\n");
-	printf("%s\n", find_path(envp));
+		ft_printf("Inch reaktiv eq\n"); //heto kpoxem
+	else
+	{
+		pipe.env_path = find_path(envp);
+		pipe.cmd_path = ft_split(pipe.env_path, ':');
+		if (pipe.pid1 = fork() != -1)
+		{
+			
+		}
+		if (pipe.pid2 = fork() != -1)
+		{
+
+		}
+		waitpid(pipe.pid1, NULL, 0);
+		waitpid(pipe.pid2, NULL, 0);
+	}
 	return (0);
 }
