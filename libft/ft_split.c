@@ -97,9 +97,9 @@ char	**ft_split(char const *s, char c)
 	int		count;
 	char	**arr;
 
-	count = count_words(s, c);
 	if (!s)
 		return (NULL);
+	count = count_words(s, c);
 	arr = (char **)malloc(sizeof(char *) * (count + 1));
 	if (!arr)
 		return (NULL);

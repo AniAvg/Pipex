@@ -14,23 +14,24 @@
 
 void	open_files(int argc, char **argv, t_pipex *pip)
 {
-	(void)argc;
 	pip->in_fd = open(argv[1], O_RDONLY);
 	if (pip->in_fd == -1)
 		send_err_and_quit("Error opening file");
-	pip->out_fd = open(argv[4], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	pip->out_fd = open(argv[argc -1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (pip->out_fd == -1)
 		send_err_and_quit("Error Opening File");
 }
 
-char *find_path(char **envp)
+char	*find_path(char **envp)
 {
-	int i;
+	int	i;
 
 	i = 0;
+	if (!envp)
+		return (NULL);
 	while (envp[i])
 	{
-		if (ft_strncmp(envp[i], "PATH=", 4))
+		if (!ft_strncmp(envp[i], "PATH", 4))
 			return (envp[i] + 5);
 		i++;
 	}
@@ -43,54 +44,61 @@ char	*get_command(char **path, char	*cmd)
 	char	*smth;
 	char	*command;
 
-	i = 0;
+	i = -1;
 	if (!path || !cmd)
 		return (NULL);
-	while (path[i])
+	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
+	{
+		if (access(cmd, F_OK) == 0)
+			return (cmd);
+		return (NULL);
+	}
+	while (path[++i])
 	{
 		smth = ft_strjoin(path[i], "/");
 		command = ft_strjoin(smth, cmd);
 		free(smth);
-		printf(" res %s\n", command);
 		if (access(command, F_OK) == 0)
 			return (command);
 		free(command);
-		i++;
 	}
+	printf(" res %s\n", command);
 	return (NULL);
 }
 
-void	execute_pipeline(t_pipex pip, char **argv, char **envp)
+void	execute_pipeline(t_pipex pipex, char **argv, char **envp)
 {
-	pip.pid1 = fork();
-	if (pip.pid1 == -1)
+	pipex.pid1 = fork();
+	if (pipex.pid1 == -1)
 		send_err_and_quit("fork() Failed");
-	if (pip.pid1 == 0)
-		cmd1_child(pip, argv, envp);
-	pip.pid2 = fork();
-	if (pip.pid2 == -1)
+	if (pipex.pid1 == 0)
+		cmd1_child(pipex, argv, envp);
+	pipex.pid2 = fork();
+	if (pipex.pid2 == -1)
 		send_err_and_quit("fork() Failed");
-	if (pip.pid2 == 0)
-		cmd2_child(pip, argv, envp);
-	close(pip.fd[0]);
-	close(pip.fd[1]);
-	waitpid(pip.pid1, NULL, 0);
-	waitpid(pip.pid2, NULL, 0);
+	if (pipex.pid2 == 0)
+		cmd2_child(pipex, argv, envp);
+	close(pipex.fd[0]);
+	close(pipex.fd[1]);
+	waitpid(pipex.pid1, NULL, 0);
+	waitpid(pipex.pid2, NULL, 0);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_pipex	pip;
+	t_pipex	pipex;
 
-	(void)argc;
 	if (argc != 5)
 		send_err_and_quit("Argument Error");
-	open_files(argc, argv, &pip);
-	if (pipe(pip.fd) == -1)
+	open_files(argc, argv, &pipex);
+	if (pipe(pipex.fd) == -1)
 		send_err_and_quit("pipe() failed");
-	pip.env_path = find_path(envp);
-	pip.cmd_path = ft_split(pip.env_path, ':');
-	execute_pipeline(pip, argv, envp);
-	free_array(pip.cmd_path);
+	pipex.env_path = find_path(envp);
+	pipex.cmd_path = ft_split(pipex.env_path, ':');
+	execute_pipeline(pipex, argv, envp);
+	free_array(pipex.cmd_path);
+	pipex.cmd_path = NULL;
+	close(pipex.in_fd);
+	close(pipex.out_fd);
 	return (0);
 }
