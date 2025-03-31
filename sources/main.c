@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <pipex.h>
+#include "pipex.h"
 
 void	open_files(int argc, char **argv, t_pipex *pip)
 {
@@ -49,8 +49,15 @@ char	*get_command(char **path, char	*cmd)
 		return (NULL);
 	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
 	{
-		if (access(cmd, F_OK) == 0)
-			return (cmd);
+		if (access(cmd, F_OK | X_OK) == 0)
+		{
+			command = ft_strdup(cmd);
+			if (!command)
+				send_err_and_quit("strdup() Failed");
+			return (command);
+		}
+		// if (access(cmd, F_OK) == 0)
+		// 	return (cmd);
 		return (NULL);
 	}
 	while (path[++i])

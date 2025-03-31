@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <pipex.h>
+#include "pipex.h"
 
 void	free_array(char **arr)
 {
@@ -54,8 +54,12 @@ void	cmd1_child(t_pipex pipex, char **argv, char **envp)
 		free_array(pipex.cmds);
 		send_err_and_quit("Command Not Found");
 	}
-	execve(pipex.pathname, pipex.cmds, envp);
-	free(pipex.pathname);
+	//execve(pipex.pathname, pipex.cmds, envp);
+	if (execve(pipex.pathname, pipex.cmds, envp) == -1)
+	{
+		send_err_and_quit("execve() Failed");
+		free(pipex.pathname);
+	}
 	free_array(pipex.cmds);
 }
 
@@ -79,7 +83,11 @@ void	cmd2_child(t_pipex pipex, char **argv, char **envp)
 		free_array(pipex.cmds);
 		send_err_and_quit("Command Not Found");
 	}
-	execve(pipex.pathname, pipex.cmds, envp);
-	free(pipex.pathname);
+	//execve(pipex.pathname, pipex.cmds, envp);
+	if (execve(pipex.pathname, pipex.cmds, envp) == -1)
+	{
+		send_err_and_quit("execve() Failed");
+		free(pipex.pathname);
+	}
 	free_array(pipex.cmds);
 }
