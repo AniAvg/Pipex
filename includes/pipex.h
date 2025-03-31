@@ -14,9 +14,9 @@
 # define PIPEX_H
 
 # include <libft.h>
-# include <unistd.h> // dup2()
+# include <unistd.h>
 # include <stdio.h>
-# include <sys/wait.h> // waitpid() 
+# include <sys/wait.h>
 
 typedef struct s_pipex
 {
