@@ -12,6 +12,13 @@
 
 #include "pipex.h"
 
+static void	err_args_quit(void)
+{
+	ft_putstr_fd("Error: Insufficient arguments.\n", 2);
+	ft_putstr_fd("Usage: ./pipex infile command1 command2 outfile\n", 2);
+	exit(2);
+}
+
 void	open_files(int argc, char **argv, t_pipex *pip)
 {
 	pip->in_fd = open(argv[1], O_RDONLY);
@@ -38,41 +45,6 @@ char	*find_path(char **envp)
 	return (NULL);
 }
 
-char	*get_command(char **path, char	*cmd)
-{	
-	int		i;
-	char	*smth;
-	char	*command;
-
-	i = -1;
-	if (!path || !cmd)
-		return (NULL);
-	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
-	{
-		if (access(cmd, F_OK | X_OK) == 0)
-		{
-			command = ft_strdup(cmd);
-			if (!command)
-				send_err_and_quit("strdup() Failed");
-			return (command);
-		}
-		// if (access(cmd, F_OK) == 0)
-		// 	return (cmd);
-		return (NULL);
-	}
-	while (path[++i])
-	{
-		smth = ft_strjoin(path[i], "/");
-		command = ft_strjoin(smth, cmd);
-		free(smth);
-		if (access(command, F_OK) == 0)
-			return (command);
-		free(command);
-	}
-	printf(" res %s\n", command);
-	return (NULL);
-}
-
 void	execute_pipeline(t_pipex pipex, char **argv, char **envp)
 {
 	pipex.pid1 = fork();
@@ -96,7 +68,7 @@ int	main(int argc, char **argv, char **envp)
 	t_pipex	pipex;
 
 	if (argc != 5)
-		send_err_and_quit("Argument Error");
+		err_args_quit();
 	open_files(argc, argv, &pipex);
 	if (pipe(pipex.fd) == -1)
 		send_err_and_quit("pipe() failed");

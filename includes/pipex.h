@@ -13,7 +13,7 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
-# include <libft.h>
+# include "libft.h"
 # include <unistd.h>
 # include <stdio.h>
 # include <sys/wait.h>
@@ -32,11 +32,15 @@ typedef struct s_pipex
 }	t_pipex;
 
 char	*find_path(char **envp);
-char	*get_command(char **path, char	*cmd);
 void	open_files(int argc, char **argv, t_pipex *pipe);
 void	send_err_and_quit(char *str);
+char	*validate_and_duplicate(char *cmd);
+char	*get_command(char **path, char	*cmd);
 void	cmd1_child(t_pipex pip, char **argv, char **envp);
 void	cmd2_child(t_pipex pip, char **argv, char **envp);
+void	execute_pipeline(t_pipex pipex, char **argv, char **envp);
+void	free_pipex_cmds(t_pipex *pipex);
+void	free_pipex_resources(t_pipex *pipex);
 void	free_array(char **arr);
 
 #endif

@@ -12,26 +12,42 @@
 
 #include "pipex.h"
 
-void	free_array(char **arr)
+char	*validate_and_duplicate(char *cmd)
 {
-	int	i;
+	char	*command;
 
-	i = 0;
-	if (!arr)
-		return ;
-	while (arr[i])
+	if (access(cmd, F_OK | X_OK) == 0)
 	{
-		free(arr[i]);
-		arr[i] = NULL;
-		i++;
+		command = ft_strdup(cmd);
+		if (!command)
+			send_err_and_quit("strdup() Failed");
+		return (command);
 	}
-	free(arr);
+	return (NULL);
 }
 
-void	send_err_and_quit(char *str)
-{
-	perror(str);
-	exit(1);
+char	*get_command(char **path, char	*cmd)
+{	
+	int		i;
+	char	*smth;
+	char	*command;
+
+	i = 0;
+	if (!path || !cmd)
+		return (NULL);
+	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
+		return (validate_and_duplicate(cmd));
+	while (path[i])
+	{
+		smth = ft_strjoin(path[i], "/");
+		command = ft_strjoin(smth, cmd);
+		free(smth);
+		if (access(command, F_OK) == 0)
+			return (command);
+		free(command);
+		i++;
+	}
+	return (NULL);
 }
 
 void	cmd1_child(t_pipex pipex, char **argv, char **envp)
@@ -51,15 +67,15 @@ void	cmd1_child(t_pipex pipex, char **argv, char **envp)
 		pipex.pathname = get_command(pipex.cmd_path, pipex.cmds[0]);
 	if (!pipex.pathname)
 	{
-		free_array(pipex.cmds);
-		send_err_and_quit("Command Not Found");
+		free_pipex_cmds(&pipex);
+		send_err_and_quit("Error");
 	}
-	//execve(pipex.pathname, pipex.cmds, envp);
 	if (execve(pipex.pathname, pipex.cmds, envp) == -1)
 	{
+		free_pipex_resources(&pipex);
 		send_err_and_quit("execve() Failed");
-		free(pipex.pathname);
 	}
+	free(pipex.pathname);
 	free_array(pipex.cmds);
 }
 
@@ -80,14 +96,14 @@ void	cmd2_child(t_pipex pipex, char **argv, char **envp)
 		pipex.pathname = get_command(pipex.cmd_path, pipex.cmds[0]);
 	if (!pipex.pathname)
 	{
-		free_array(pipex.cmds);
+		free_pipex_cmds(&pipex);
 		send_err_and_quit("Command Not Found");
 	}
-	//execve(pipex.pathname, pipex.cmds, envp);
 	if (execve(pipex.pathname, pipex.cmds, envp) == -1)
 	{
+		free_pipex_resources(&pipex);
 		send_err_and_quit("execve() Failed");
-		free(pipex.pathname);
 	}
+	free(pipex.pathname);
 	free_array(pipex.cmds);
 }
