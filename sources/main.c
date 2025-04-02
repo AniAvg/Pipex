@@ -19,13 +19,13 @@ static void	err_args_quit(void)
 	exit(2);
 }
 
-void	open_files(int argc, char **argv, t_pipex *pip)
+void	open_files(int argc, char **argv, t_pipex *pipex)
 {
-	pip->in_fd = open(argv[1], O_RDONLY);
-	if (pip->in_fd == -1)
+	pipex->in_fd = open(argv[1], O_RDONLY);
+	if (pipex->in_fd == -1)
 		send_err_and_quit("Error opening file");
-	pip->out_fd = open(argv[argc -1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (pip->out_fd == -1)
+	pipex->out_fd = open(argv[argc -1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (pipex->out_fd == -1)
 		send_err_and_quit("Error Opening File");
 }
 
